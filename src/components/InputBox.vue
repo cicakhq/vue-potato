@@ -40,8 +40,10 @@ export default {
       this.value = ''
     },
     keydown (event) {
-      // detect special keys
-      this.sendTyping()
+      if (!(event.altKey || event.ctrlKey || event.key === 'Control' || event.key === 'Alt')) {
+        // do not send a typing notification for Alt-Tab, Ctrl-Tab…
+        this.sendTyping()
+      }
       if (event.code === 'Enter' && !event.shiftKey && !event.ctrlKey && !event.altKey) {
         event.preventDefault()
         this.$el.firstChild.textContent = ''
