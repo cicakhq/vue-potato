@@ -6,7 +6,7 @@ main#potato-root
   summary
     h1 {{ title || 'Potato' }}
     h2(v-if="subtitle") {{ subtitle }}
-  mark(v-if="loading") loading…
+  mark#loading(v-if="loading") loading…
   router-view(v-else :key="$route.fullPath")
   footer
     InputBox(v-if="inChannel" :channelid="inChannelId")
@@ -17,8 +17,8 @@ main#potato-root
       ul
         li(v-for="channel in domain.channels")
           router-link(:to="{ name: 'channel', params: { id: channel.id }}")
-            b(v-if="inChannelId === channel.id") {{ channel.name }}
-            p(v-else) {{ channel.name }}
+            mark(v-if="inChannelId === channel.id") {{ channel.name }}
+            span(v-else) {{ channel.name }}
   aside
     p Preferences
 </template>
@@ -69,6 +69,11 @@ default-horizontal-margin = 30px
   grid-template-rows: 4em 1fr fit-content(8em)
   height: 100vh
   max-height: 100vh
+
+#loading
+  position: fixed
+  left: 50%
+  top: 50%
 
 header
   font-weight: 700
@@ -143,6 +148,4 @@ aside
   box-shadow: 0 1px 1px -1px rgba(0,0,0,0.1)
   padding: 0 default-horizontal-margin
 
-mark
-  position: absolute
 </style>
