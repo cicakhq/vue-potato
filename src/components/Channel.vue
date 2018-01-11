@@ -77,18 +77,25 @@ export default {
       return this.$store.getters.getChannelTypingState(this.channelId)
     }
   },
+  methods: {
+    checkAndFixScrollPosition () {
+      let scrollPositionBottom = this.$el.scrollHeight - this.$el.offsetHeight
+      let scrollIsAtBottom = (this.$el.scrollTop === scrollPositionBottom)
+      if (scrollWasAtBottom && !scrollIsAtBottom) {
+        this.$el.scrollTop = scrollPositionBottom
+      }
+    }
+  },
   beforeUpdate () {
     let scrollPositionBottom = this.$el.scrollHeight - this.$el.offsetHeight
     scrollWasAtBottom = (Math.abs(this.$el.scrollTop - scrollPositionBottom) <= pixelTolerance)
   },
   updated () {
-    let scrollPositionBottom = this.$el.scrollHeight - this.$el.offsetHeight
-    let scrollIsAtBottom = (this.$el.scrollTop === scrollPositionBottom)
-    if (scrollWasAtBottom && !scrollIsAtBottom) {
-      this.$el.scrollTop = scrollPositionBottom
-    }
+    this.checkAndFixScrollPosition()
   },
   mounted () {
+    // handle resize events to keep scroll position in check
+    window.onresize = this.checkAndFixScrollPosition
     if (this.currentChannel) {
       this.$store.dispatch(FETCH_CHANNEL_MESSAGES, this.channelId)
       this.$store.dispatch(FETCH_CHANNEL_DETAILS, this.channelId)
