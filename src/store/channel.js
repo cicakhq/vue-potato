@@ -12,19 +12,24 @@ export const SET_WEBSOCKET = 'setWebSocket'
 export const ADD_NEW_MESSAGE = 'addNewMessage'
 export const SET_CHANNEL_DETAILS = 'setChannelDetails'
 
+const channelKey = (id) => 'channel_' + id
+const msgKey = (id) => 'msg_' + id
+const loadingKey = (id) => 'loading_' + id
+const typingKey = (id) => 'typing_' + id
+
 const mutations = {
   [SET_DOMAINS] (state, domains) {
     for (let domain of domains) {
       for (let channel of domain.channels) {
-        Vue.set(state, 'channel_' + channel.id, {...channel, web_domain: domain.id})
+        Vue.set(state, channelKey(channel.id), {...channel, web_domain: domain.id})
       }
     }
   },
   [SET_MESSAGES] (state, payload) {
-    Vue.set(state, 'msg_' + payload.channelId, payload.messages)
+    Vue.set(state, msgKey(payload.channelId), payload.messages)
   },
   [ADD_NEW_MESSAGE] (state, message) {
-    let channelKey = 'msg_' + message.channel
+    let channelKey = msgKey(message.channel)
     if (state[channelKey]) {
       state[channelKey].push(message)
     } else { // initialise?
@@ -32,16 +37,15 @@ const mutations = {
     }
   },
   [SET_LOADING_CHANNEL] (state, payload) {
-    Vue.set(state, 'loading_' + payload.channelId, payload.loading)
+    Vue.set(state, loadingKey(payload.channelId), payload.loading)
   },
   [SET_CHANNEL_DETAILS] (state, payload) {
-    let channelKey = 'channel_' + payload.id
-    let details = state[channelKey]
+    let details = state[channelKey(payload.id)]
     Object.assign(details, payload) // shallow merge of new details
-    Vue.set(state, channelKey, details)
+    Vue.set(state, channelKey(payload.id), details)
   },
   [SET_TYPING_IN_CHANNEL] (state, message) {
-    let stateKey = 'typing_' + message.channel
+    let stateKey = typingKey(message.channel)
     let typing = state[stateKey] || []
     let indexOf = typing.indexOf(message.user)
     if (message['add-type'] === 'begin' && indexOf === -1) {
@@ -52,8 +56,12 @@ const mutations = {
     Vue.set(state, stateKey, typing)
   },
   [SET_WEBSOCKET] (state, payload) {
-    state.websocket = new WebSocket(payload.websocket_url + '/' + payload.channelId)
-    state.websocket.onmessage = (m) => payload.websocket_onmessage(m)
+    let details = state[channelKey(payload.channelId)]
+    if (!details.hasOwnProperty('websocket')) {
+      details['websocket'] = new WebSocket(payload.websocket_url + '/' + payload.channelId)
+      details['websocket'].onmessage = (m) => payload.websocket_onmessage(m)
+      Vue.set(state, channelKey(payload.channelId), details)
+    }
   }
 }
 
