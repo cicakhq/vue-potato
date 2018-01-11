@@ -1,6 +1,6 @@
 <template lang="pug">
 fieldset#input-box
-  div#channel-input(contenteditable=true, @keydown="keydown")
+  div#channel-input(contenteditable=true @keydown="keydown")
 </template>
 
 <script>
@@ -14,11 +14,23 @@ export default {
   data: function () {
     return { value: '' }
   },
+  mounted () {
+    let observer = new MutationObserver(this.reactToMutation)
+    observer.observe(this.$el, { characterData: true, subtree: true })
+  },
   methods: {
     sendTyping () {
       if (Date.now() - lastSent > sendTypingEveryMilliseconds) {
         console.log('send /channel/' + this.channelid + '/type')
         api.potato('channel/' + this.channelid + '/type', 'POST', {state: true}).then(function () { lastSent = Date.now() })
+      }
+    },
+    reactToMutation (mutations) {
+      console.log(mutations)
+      for (let mutation of mutations) {
+        if (mutation.type === 'characterData') {
+          this.value = mutation.target.textContent
+        }
       }
     },
     sendMessage () {
@@ -28,23 +40,22 @@ export default {
       this.value = ''
     },
     keydown (event) {
+      // detect special keys
       this.sendTyping()
       if (event.code === 'Enter' && !event.shiftKey && !event.ctrlKey && !event.altKey) {
         event.preventDefault()
+        this.$el.firstChild.textContent = ''
         return this.sendMessage()
       }
-      this.value += event.key
       // TODO check not locked
       // DONE send is typing
       // TODO callback for the resize, still required?
       // DONE ENTER sends, but not shift-ENTER
       // TODO ESC cancels
       // TODO search for magic characters (@, :)
-      // TODO ignore platform keys (Ctrl-C, Ctrl-TAB…)
       // TODO manage placeholder
       // TODO create TAGS (uneditable and place them)
       // TODO manage automatic focus
-      console.log(event)
     }
   }
 }
