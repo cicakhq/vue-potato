@@ -16,7 +16,9 @@ main#potato-root
       h3(v-if="domain.channels.length > 0") {{ domain.name }}
       ul
         li(v-for="channel in domain.channels")
-          router-link(:to="{ name: 'channel', params: { id: channel.id }}") {{ channel.name }}
+          router-link(:to="{ name: 'channel', params: { id: channel.id }}")
+            b(v-if="inChannelId === channel.id") {{ channel.name }}
+            p(v-else) {{ channel.name }}
   aside
     p Preferences
 </template>
