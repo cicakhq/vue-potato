@@ -130,14 +130,19 @@ nav
   padding-left: default-horizontal-margin
   overflow-x: auto
   color: potato-text
+  h3
+    margin-top: 1em
+    margin-bottom: .5em
   ul
     list-style-type: none
     padding-left: 1em
-    li
-      padding-bottom: 1em
+    margin-top: 0em
   a
     color: inherit
     text-decoration: none
+    display: block
+    padding-top: .5em
+    padding-bottom: .5em
 
 aside
   grid-area: aside
