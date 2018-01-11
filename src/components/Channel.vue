@@ -102,6 +102,8 @@ export default {
       this.$store.dispatch(SUBSCRIBE_TO_CHANNEL_MESSAGES, this.channelId)
       this.$store.dispatch(FETCH_CHANNEL_USERS, this.channelId)
     }
+    scrollWasAtBottom = true
+    this.checkAndFixScrollPosition()
   }
 }
 </script>
